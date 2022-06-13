@@ -28,7 +28,6 @@ public class Telefone implements Serializable{
 	
 	private String numero;
 	
-	@SuppressWarnings("deprecation")
 	@JsonIgnore //Evitar loop na lista de usuario
 	@ForeignKey(name = "usuario_id")
 	@ManyToOne
