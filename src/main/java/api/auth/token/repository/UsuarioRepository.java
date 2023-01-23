@@ -1,5 +1,7 @@
 package api.auth.token.repository;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,5 +25,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
 	@Modifying
 	@Query(nativeQuery = true, value = "update usuario set token = ?1 where login = ?2")
 	void atualizaTokenUsuario(String token, String login);
+	
+	@Query("select u from Usuario u where u.nome like %?1% ")
+	List<Usuario> findUserByNome(String nome);
 
 }

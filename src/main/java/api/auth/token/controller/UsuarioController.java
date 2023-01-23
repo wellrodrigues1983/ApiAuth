@@ -30,75 +30,80 @@ import api.auth.token.repository.UsuarioRepository;
 @RestController
 @RequestMapping(value = "/usuario")
 public class UsuarioController {
-	
+
 	@Autowired
 	private UsuarioRepository usuarioRepository;
-	
-	@GetMapping(value = "/{id}", produces = "application/json")	
-	@CacheEvict(value = "cacheuserid", allEntries = true)//remove cache não utilizado
-	@CachePut("cacheuserid")//atualiza o cache com mudanças de put
-	public ResponseEntity<Usuario> usuarioPorId(@PathVariable (value = "id") Long id){
-		
+
+	@GetMapping(value = "/{id}", produces = "application/json")
+	@CacheEvict(value = "cacheuserid", allEntries = true) // remove cache não utilizado
+	@CachePut("cacheuserid") // atualiza o cache com mudanças de put
+	public ResponseEntity<Usuario> usuarioPorId(@PathVariable(value = "id") Long id) {
+
 		Optional<Usuario> usuario = usuarioRepository.findById(id);
-		
+
 		if (usuario != null) {
 			return new ResponseEntity<Usuario>(usuario.get(), HttpStatus.OK);
-		}else {
+		} else {
 			System.out.println("Id: " + id);
 		}
-		
 		return null;
-		
-		
 	}
-	
+
 	@GetMapping(value = "/", produces = "application/json")
-	@CacheEvict(value = "cacheuserall", allEntries = true)//remove cache não utilizado
-	@CachePut("cacheuserall")//atualiza o cache com mudanças de put
-	public ResponseEntity<List<Usuario>> todosUsuarios(){
-		
+	@CacheEvict(value = "cacheuserall", allEntries = true) // remove cache não utilizado
+	@CachePut("cacheuserall") // atualiza o cache com mudanças de put
+	public ResponseEntity<List<Usuario>> todosUsuarios() {
+
 		List<Usuario> list = usuarioRepository.findAll();
-		
+
 		return new ResponseEntity<List<Usuario>>(list, HttpStatus.OK);
-		
 	}
-	
+
+	@GetMapping(value = "/usuarioPorNome/{nome}", produces = "application/json")
+	@CacheEvict(value = "usuarioPorNome", allEntries = true) // remove cache não utilizado
+	@CachePut("usuarioPorNome") // atualiza o cache com mudanças de put
+	public ResponseEntity<List<Usuario>> usuarioPorNome(@PathVariable("nome") String nome) {
+
+		List<Usuario> list = usuarioRepository.findUserByNome(nome);
+
+		return new ResponseEntity<List<Usuario>>(list, HttpStatus.OK);
+	}
+
 	@PostMapping(value = "/criar", produces = "application/json")
-	public ResponseEntity<Usuario> salvarUsuario(@RequestBody Usuario usuario){
-		
+	public ResponseEntity<Usuario> salvarUsuario(@RequestBody Usuario usuario) {
+
 		String pswCripto = new BCryptPasswordEncoder().encode(usuario.getSenha());
 		usuario.setSenha(pswCripto);
-		
+
 		Usuario usuariosalvar = usuarioRepository.save(usuario);
-		
+
 		return new ResponseEntity<Usuario>(usuariosalvar, HttpStatus.OK);
-		
+
 	}
-	
+
 	@PutMapping(value = "/atualizar", produces = "application/json")
-	public ResponseEntity<Usuario> editarUsuario(@RequestBody Usuario usuario){
-		
+	public ResponseEntity<Usuario> editarUsuario(@RequestBody Usuario usuario) {
+
 		Usuario usertemp = usuarioRepository.findUserByLogin(usuario.getLogin());
-		
-		if (!usertemp.getSenha().equals(usuario.getSenha())) {/*Senhas diferentes na atualizacao*/
+
+		if (!usertemp.getSenha().equals(usuario.getSenha())) {/* Senhas diferentes na atualizacao */
 			String pswCripto = new BCryptPasswordEncoder().encode(usuario.getSenha());
 			usuario.setSenha(pswCripto);
 		}
-		
+
 		Usuario usuariosalvar = usuarioRepository.save(usuario);
-		
+
 		return new ResponseEntity<Usuario>(usuariosalvar, HttpStatus.OK);
-		
+
 	}
-	
-	
+
 	@DeleteMapping(value = "/delete/{id}", produces = "application/text")
-	public String  deletarUsuario(@PathVariable ("id") Long id){
-		
+	public String deletarUsuario(@PathVariable("id") Long id) {
+
 		usuarioRepository.deleteById(id);
-		
+
 		return "Ok";
-		
+
 	}
 
 }

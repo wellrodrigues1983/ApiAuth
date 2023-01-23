@@ -44,7 +44,7 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 		.anyRequest().authenticated().and().logout().logoutSuccessUrl("/index")
 		
 		/*Mapeia a url de logout e invalida o usuario*/
-		.logoutRequestMatcher(new AntPathRequestMatcher("/logou"))
+		.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 		
 		/*Filtra requisicoes de login para autenticar*/
 		.and().addFilterBefore(new JWTLoginFilter("/login", authenticationManager()), UsernamePasswordAuthenticationFilter.class)
